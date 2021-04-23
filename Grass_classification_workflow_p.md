@@ -9,7 +9,7 @@ Celina Vionnet (1), Daniel Castellano (2),  Lucía Magnin (3), Mónica Pascual (
 building/construction; Landsat; GRASS GIS; pixel based classification; OBIA.
 
 ### Introduction 
-This article explores two strategies for the identification of pixels corresponding to built-up areas in multispectral images of medium spatial resolution. Pixel-based classifiers and object-oriented satellite image analysis have been widely used and compared for the determination of urban features in medium-resolution multispectral images. As discussed in several investigations (i.e. Tadesse et al. 2012; Waqar et al. 2012), the classification of urban features presents difficulties due to the variability of the materials used, the diversity of spectral responses encountered, and the similarity of these responses to natural features such as rock outcrops and bare soil. Although there are numerous proposals on how to approach this issue / problem, the procedures cannot be extrapolated to other areas without a prior evaluation of the performance obtained. This tutorial presents a workflow created to compare, with GRASS GIS, the performance of two different classification strategies of medium resolution multispectral imagery, for the determination of built-up area within the case study (Figure 1). The classification techniques used were unsupervised pixel-based classification by classifying with four classes and subsequently reclassifying to two classes corresponding to "Built-up", "Non built-up"; and supervised object-based image analysis (OBIA) through Machine Learning.
+This article explores two strategies for the identification of pixels corresponding to built-up areas in multispectral images of medium spatial resolution. Pixel-based classifiers and object-oriented satellite image analysis have been widely used and compared for the determination of urban features in medium-resolution multispectral images. As discussed in several investigations (i.e. Tadesse et al. 2012; Waqar et al. 2012), the classification of urban features presents difficulties due to the variability of the materials used, the diversity of spectral responses encountered, and the similarity of these responses to natural features such as rock outcrops and bare soil. Although there are numerous proposals on how to approach this problem, the procedures cannot be extrapolated to other areas without a prior evaluation of the performance obtained. This tutorial presents a workflow created to compare, with GRASS GIS, the performance of two different classification strategies of medium resolution multispectral imagery, for the determination of built-up area within the case study (Figure 1). The classification techniques used were unsupervised pixel-based classification by classifying with four classes and subsequently reclassifying to two classes corresponding to "Built-up", "Non built-up"; and supervised object-based image analysis (OBIA) through Machine Learning.
 
 ![Figure 1. Steps followed to achieve the goals proposed in GRASS GIS.](https://github.com/dcstlln/Alfa/blob/RGrass/WorkFlow.jpg)
 
@@ -87,7 +87,7 @@ Moving from digital numbers to surface reflectance and brightness temperature
 i.landsat.toar input=LC08_L1TP_229082_20200215_20200225_01_T1_B output=LC08_L1TP_229082_20200215_20200225_01_T1_c_B \
 sensor=oli8 metfile=$HOME/grassgis/LC08_L1TP_229082_20200215_20200225_01_T1_MTL.txt  method=dos1
 ```
--->it generate a number of useful maps named: _LC08_L1TP_229082_20200215_20200225_01_T1_c_B[N], where [N] is 1|2|3|4|5|6|7|9.
+-->it generates a number of useful maps named: _LC08_L1TP_229082_20200215_20200225_01_T1_c_B[N], where [N] is 1|2|3|4|5|6|7|9.
 
 Correcting topographic shading (only 30m optical, excluding cirrus)
 Obtain position solar variables from the metadata file ([MTL file](https://github.com/dcstlln/Alfa/blob/RGrass/LC08_L1TP_229082_20200215_20200225_01_T1_MTL.txt), zenith and azimuth values "zenith angle = 90° - elevation").
@@ -100,9 +100,9 @@ A=67.86241430
 i.topo.corr -i base=dem zenith=$Z azimuth=$A output=L8.ilu
 i.topo.corr base=L8.ilu input=$Lista output=t_ zenith=$Z method=percent #correct topography
 ```
-This block generate an iluminatin model (shading) and uses it to correct shadows in Landsat bands. See _l8.ilu_ [here](https://github.com/dcstlln/Alfa/blob/RGrass/L8ilu.jpg)
+This block generates an illumination model (shading) and uses it to correct shadows in Landsat bands. See _l8.ilu_ [here](https://github.com/dcstlln/Alfa/blob/RGrass/L8ilu.jpg)
 
--->it generate a number of useful maps named: t_LC08_L1TP_229082_20200215_20200225_01_T1_c_B[N], where [N] is 1|2|3|4|5|6|7|9.
+-->it generates a number of useful maps named: t_LC08_L1TP_229082_20200215_20200225_01_T1_c_B[N], where [N] is 1|2|3|4|5|6|7|9.
 
 #### Here you can see a comparison between the RGB composition of the original bands in digital numbers and the reflectance of the surface with topographic correction: 
 ![Landsat 8: comparison before and after corrections calibrations](https://github.com/dcstlln/Alfa/blob/RGrass/CompNDsRad.jpg)
@@ -115,7 +115,7 @@ for (( i=1; i<=7; i++ )); do \
     r.fillnulls input=t_.LC08_L1TP_229082_20200215_20200225_01_T1_c_B$i output=L8_ctf$i; \
     done
 ```
--->it generate a number of useful maps named: L8_ctf[N], where [N] is 1|2|3|4|5|6|7|9
+-->it generates a number of useful maps named: L8_ctf[N], where [N] is 1|2|3|4|5|6|7|9
 
 Generating panchromatic band and compute textures by IDM (1/enthropy) and ASM (1/contrast) methods.
 ```
@@ -123,13 +123,13 @@ r.mapcalc "Pancro=(L8_ctf1+L8_ctf2+L8_ctf3+L8_ctf4)/4"
 r.colors map=Pancro -e color=grey #Color table application for panchromatic band visualization.
 r.texture input=Pancro output=Texturas size=5 distance=1 method=idm,asm  
 ```
--->it generate three useful maps:
+-->it generates three useful maps:
 
 |_Pancro_| _Texturas_ASM_| _Texturas_ID|
 |--------------------------------------|--------------------------------------|--------------------------------------|
 |![_Pancro_](https://github.com/dcstlln/Alfa/blob/RGrass/Pancro.jpg)|![_Texturas_ASM_](https://github.com/dcstlln/Alfa/blob/RGrass/TextIDM.jpg)| ![_Texturas_IDM_](https://github.com/dcstlln/Alfa/blob/RGrass/TextASM.jpg)|
 
-Generating spectral indexes: NDBI (normalized difference built up index) and SAVI (soil adjusted vegetation index) with  r.mapcalc y i.vi.
+Generating spectral indexes: NDBI (normalized difference built-up index) and SAVI (soil adjusted vegetation index) with  r.mapcalc and i.vi.
 Reclassify odd values above 1 and below -1.
 ```
 r.mapcalc "L8_NDBI=(L8_ctf5-L8_ctf4)/(L8_ctf5+L8_ctf4)" #NDBI  = (OLI6 – OLI5) / (OLI6 + OLI5)
@@ -139,7 +139,7 @@ r.mapcalc "L8_NDBIc=if(L8_NDBI<-1,null(),L8_NDBIc)" --overwrite
 r.mapcalc "L8_SAVIc=if(L8_SAVI>1,null(),L8_SAVI)" --overwrite
 r.mapcalc "L8_SAVIc=if(L8_SAVI<-1,null(),L8_SAVIc)" --overwrite
 ```
--->it generate useful two maps:
+-->it generates two useful maps:
 
 |_L8\_NDBIc_|_L8\_SAVIc_|
 |-----------------------------|--------------------------------|
@@ -218,7 +218,7 @@ v.db.addcolumn train_segments column="class"
 v.distance from=train_segments to=VCEdPoli upload=to_attr column=class to_column=Edificado
 db.select sql="SELECT class,COUNT(cat) as count_class FROM train_segments GROUP BY class"
 ```
---> The output vector training map its called _train_segments_
+--> The output vector training map it's called _train_segments_
 
 _The color pallette can by set for the training vector using_ *v.colors map=train_segments rules=$HOME/grassgis/PaletaUrbana column=class*, for better representation on Grass map viewer
 
@@ -248,7 +248,7 @@ The results of both tests are shown in the following table
 - The first observation is that the OBIA classification procedure involves a greater number of steps and is generally more complicated compared to the unsupervised classification.
 - Second: the performance evaluation for the methods, through the OC parameter, showed that in the tested conditions, the pixel-based classification exceeded the object-based classification by 10%. But different classification conditions for the first method produce variations of OC. For example, the OC obtained using 4 initial classes (not 11) and reclassifying two subsequent ones reached only 80%.
 The performance of the OBIA classification Obia efficiency can be influenced by spatial resolution of Landsat images (30 m), which prevents making use of the greater advantages of OBIA (greater precision in the definition of buildings, in this case) (Blaschke 2010).
-As a conclusion, a greater number/wider range of configurations in the classification strategies should be explored, such as using higher spatial resolution data, using spectral indexes that improve the discrimination of classes with lower spectral separability such as rock and urban areas, e. g., incorporating the indexes proposed by Waqar et al. (2012), which in this first approximation were not used, and using a greater number of initial classes in the unsupervised classification.
+As a conclusion, a wider range of configurations in the classification strategies should be explored, such as using higher spatial resolution data, using spectral indexes that improve the discrimination of classes with lower spectral separability such as rock and urban areas, e. g., incorporating the indexes proposed by Waqar et al. (2012), which in this first approximation were not used, and using a greater number of initial classes in the unsupervised classification.
  
 
 ### 11. Bibliography
